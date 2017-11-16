@@ -1,0 +1,46 @@
+
+<h1>Componente = second-component</h1>
+
+<h2>Ejercicio 1</h2>
+
+<button (click)="verDatosAlumnos()">{{_labelBoton}}</button>
+
+<p>Alumnos</p>
+
+<ul *ngIf="_verListado">
+    <li *ngFor="let alumno of _alumnos; index as i; first as primero">
+        <span *ngIf="primero; else losdemas" class="textoRojo">
+            {{i}} {{alumno.nombre}} - {{alumno.curso}}
+        </span>
+        <ng-template #losdemas>
+            {{i}} {{alumno.nombre}} - {{alumno.curso}}
+        </ng-template>
+    </li>
+</ul>
+
+
+<!-- PROPERTY BINDING -------------------------------------------------------- 
+| Para simplificar, en lugar de usar la directiva "ngIf" se usa lo que se llama
+| "Porperty binding".
+-------------------------------------------------------------------------- -->
+<ul *ngIf="_verListado && nombreUsuario">
+    <li *ngFor="let alumno of _alumnos; index as i; first as primero">
+        <span 
+            [class.textoRojo]  = "primero" 
+            [class.textoVerde] = "i==1">
+            {{i}} {{alumno.nombre}} - {{alumno.curso}}
+        </span>
+    </li>
+</ul>
+<!-- -------------------------------------------------------------------------- -->
+
+
+<h2>Ejercicio 2</h2>
+<!-- ------------------------------------------------------------------------ 
+| Con el # nos sirve para identificar el elemento por parte de Angular
+-------------------------------------------------------------------------- -->
+<input type="text" #nombre placeholder="Nombre alumno"/>
+<input type="button" value="Mostrar nombre" (click)="nombreUsuario = nombre.value"/>
+<p>
+    Visualizado por {{ nombreUsuario }}
+</p>
