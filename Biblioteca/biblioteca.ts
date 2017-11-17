@@ -118,14 +118,17 @@ function checkoutBooks(name:string, ...bookIds: number[])
     //===============================================================================
     // Devolver Book[] --> Los objetos libro disponibles
     // (NOTA: Falta por implementar)
-    //===============================================================================
-    /*
-        return LIBROS.filter(
-            function(book){
+    //===============================================================================    
+    /*return LIBROS.filter(
+        function(book){
 
-            }
-        );
-    */
+        }
+    );*/
+
+    return LIBROS.filter(function(book){
+        //let book = getBookById(ident);
+        return (bookIds.indexOf(book.id) != -1) && book.avaliable;
+    });
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
