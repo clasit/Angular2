@@ -9,17 +9,23 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { ProductListComponent } from './products/product-list.component';
+import { StarComponent } from './shared/star.component';
+import { ConvertToSpacesPipe } from './shared/convert-to-spaces.pipe';
 
 
 @NgModule({
-  declarations: [
+  declarations: [     // Array con todos los componentes
     AppComponent,
-    ProductListComponent
+    ProductListComponent,
+    StarComponent,
+    ConvertToSpacesPipe
   ],
   imports: [
     BrowserModule, FormsModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  // Se tienen que definir los servicios si queremos usarto en toda la plicación
+  // providers: [ProductService],
+
+  bootstrap: [AppComponent] // Módulo de inicio de la aplicación
 })
 export class AppModule { }

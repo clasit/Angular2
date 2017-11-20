@@ -43,7 +43,7 @@
               </thead>
               <tbody>
                 <!-- Iterar sobre los elementos para mostrarlos -->
-                <tr *ngFor="let product of products">
+                <tr *ngFor="let product of filteredProducts">
                   <td>
                     <!------------------------------------------------------------------>
                     <!-- Dos maneras para asignar a src la url de la imagen           -->
@@ -56,11 +56,16 @@
                     <!-- <img *ngIf="showImage" src={{product.imageUrl}} alt="image"> -->
                     <!------------------------------------------------------------------>
                   </td>                  
-                  <td>{{product.name}}</td> 
-                  <td>{{product.code}}</td> 
+                  <td>{{product.name | uppercase}}</td> 
+                  <td>{{product.code | convertToSpaces:'-'}}</td>
                   <td>{{product.releaseDate}}</td> 
-                  <td>{{product.price}}</td>
-                  <td>{{product.rating}}</td>
+                  <td>{{product.price | currency:'EUR':true:'1.2-2'}}</td>
+                  <td>
+                    <app-star [rating]="product.rating" 
+                      (ratingClick)="ratingChange($event, product)">
+                      <!-- El componente hijo emite un evento 'ratingClick' y ejecuta la función del padre -->
+                    </app-star>
+                  </td>
                 </tr> 
               </tbody> 
             </table>

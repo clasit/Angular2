@@ -1,11 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from './product.interface';
+import { ProductService } from './product.service';
 
 
 @Component({
   selector: 'app-product-list',
   templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css']
+  styleUrls: ['./product-list.component.css'],
+
+  // Se tienen que definir los servicios
+  providers: [ProductService]
 })
 
 
@@ -21,30 +25,21 @@ export class ProductListComponent implements OnInit {
   private imageWidth:number = 50;
   private imageMargin:number = 10;
 
-  products:Product[] = [
-    { 
-      id: 78954,
-      name: 'Producto 1',
-      code: 'P-1',
-      relaseDate: '18 Noviembre',
-      description:'Calidad / precio',
-      price: 99,
-      rating: 4,
-      imageUrl: 'https://www.travelreport.mx/wp-content/uploads/2017/11/comida-tlaxcala-100x100.jpg'
-    },
-    { 
-      id: 78955,
-      name: 'Producto 2',
-      code: 'P-3',
-      relaseDate: '1 Enero',
-      description:'Calidad / precio',
-      price: 99,
-      rating: 4,
-      imageUrl: 'http://d2z8v02fmnep0k.cloudfront.net/sites/elobservatodo.cl/files/imagecache/100x100/comida_semana_santa_que_cocinar_viernes_santo_ceviche_0.jpg'
-    }
-  ]
 
-  constructor() { }
+  products:Product[] = [];
+
+
+filteredProducts:Product[] = [];
+
+
+              // MECANISMO DE INYECCCIÓN A TRAVÉS DEL CONSTRUCTOR ----------------
+              // Poner directamente el 'private' en el parámetro nos evita
+              // crear una propiedad privada y asignar. Es un método rápido.
+              // Luego _productService será visible en toda la clase
+              // simplemente definiéndola en el constructor como parámetro private
+              //------------------------------------------------------------------
+  constructor(private _productService: ProductService) {    
+  }
 
   get listFilter(){
     return this._listFilter;
@@ -52,13 +47,65 @@ export class ProductListComponent implements OnInit {
 
   set listFilter(value:string){
     this._listFilter = value;
+    this.filteredProducts = this.listFilter ? this.performFilter( this.listFilter ) : this.products;
   }
+  
+  performFilter(filterBy:string):Product[]
+  {
+    filterBy = filterBy.toLocaleLowerCase();
+    /*------------------------------------------------------------------------
+    return this.products.filter(      
+      // Realiza el filtrado
+      function(product:Product){
+        // Condición de filtrado. !=-1 Muestra aquellos que se han encontrado
+        return ( product.name.toLocaleLowerCase().indexOf(filterBy) !== -1 );
+      }      
+    );
+    ------------------------------------------------------------------------*/
+
+    // Lo mismo mediante funciones arrow
+    return this.products.filter(
+      // NOTA: Me gustaría saber si esta forma de filtrado es eficiente
+      //       Parece que filter será como un bucle y indexOf es otro bucle !!!!
+      (p:Product) => p.name.toLocaleLowerCase().indexOf(filterBy) !== -1
+    );
+  }
+
   
   toggleImage(){
     this.showImage = !this.showImage;
   }
 
-  ngOnInit() {
+
+
+  /*
+   * Este función esta asociado a un
+   */
+  ratingChange(event, product){
+    // Sólo como prueba: cambia el título, usa el tipo de datos del evento
+    this.pageTitle = event;
+
+    // Incrementa el rating
+    product.rating++;
   }
 
+
+
+  ngOnInit() {
+    /*-------------------------------------------------------------------------
+     * Se usa la clase inyectada, la cual fue inicializada en el constructor.
+     * Cuando se trabaje con servicios es mejor poner la inicializacion en
+     * ngOnInit que en el constructor.
+     *
+     * En algunos casos el constructor no se ejecuta y sin embargo si que se
+     * ejecuta el ngOnInit.
+     *
+     * Por norma general:
+     * Aqui se pondrán todas aquellas acciones que tienen que ver con las vistas
+     * y los servicios.
+     *-------------------------------------------------------------------------*/    
+    this.products = this._productService.getProducts();
+
+    this.filteredProducts = this.products;
+  }  
 }
