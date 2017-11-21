@@ -24,7 +24,7 @@
         </div>
         <div class="row">
           <div class="table-responsive">
-            <table class="table" *ngIf="products">
+            <table class="table">
               <thead>
                 <tr>
                   <th>
@@ -43,7 +43,8 @@
               </thead>
               <tbody>
                 <!-- Iterar sobre los elementos para mostrarlos -->
-                <tr *ngFor="let product of filteredProducts">
+                <!-- <tr *ngFor="let product of products | async"> -->
+                <tr *ngFor="let product of filteredProducts">                    
                   <td>
                     <!------------------------------------------------------------------>
                     <!-- Dos maneras para asignar a src la url de la imagen           -->
@@ -56,7 +57,10 @@
                     <!-- <img *ngIf="showImage" src={{product.imageUrl}} alt="image"> -->
                     <!------------------------------------------------------------------>
                   </td>                  
-                  <td>{{product.name | uppercase}}</td> 
+                  <td>
+                    <!-- Ojo, no se pone 'href' cuando se trata de un enroudato -->
+                    <a [routerLink]="['/products', product.id]">{{product.name | uppercase}}</a>
+                  </td> 
                   <td>{{product.code | convertToSpaces:'-'}}</td>
                   <td>{{product.releaseDate}}</td> 
                   <td>{{product.price | currency:'EUR':true:'1.2-2'}}</td>

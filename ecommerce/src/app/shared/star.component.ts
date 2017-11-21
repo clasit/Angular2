@@ -45,7 +45,7 @@ export class StarComponent implements OnInit {
 
   /*
    * Se ejecuta cuando cambia cualquiera de las propiedades del componente
-   * se necesita iportar 'OnChanges' desde el core del angular.
+   * se necesita importar 'OnChanges' desde el core del angular.
    */
   ngOnChanges(){
     this.starWidth = this.rating * 86 / 5;

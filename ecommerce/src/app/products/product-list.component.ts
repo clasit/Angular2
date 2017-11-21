@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Product } from './product.interface';
 import { ProductService } from './product.service';
+import { error } from 'util';
+import { Observable } from 'rxjs/Observable';
+
 
 
 @Component({
@@ -9,11 +12,13 @@ import { ProductService } from './product.service';
   styleUrls: ['./product-list.component.css'],
 
   // Se tienen que definir los servicios
-  providers: [ProductService]
+  // providers: [ProductService]
 })
 
 
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, OnDestroy {
+
+  subscription: any;
 
   /*----------------------------------------------------------------------
    * Se puede usar tanto la interpolación con una variable pública
@@ -25,11 +30,11 @@ export class ProductListComponent implements OnInit {
   private imageWidth:number = 50;
   private imageMargin:number = 10;
 
-
+  
+  /*** products:Observable<Product[]>; ***/
   products:Product[] = [];
 
-
-filteredProducts:Product[] = [];
+  filteredProducts:Product[] = [];  
 
 
               // MECANISMO DE INYECCCIÓN A TRAVÉS DEL CONSTRUCTOR ----------------
@@ -41,15 +46,18 @@ filteredProducts:Product[] = [];
   constructor(private _productService: ProductService) {    
   }
 
+
   get listFilter(){
     return this._listFilter;
   }
+
 
   set listFilter(value:string){
     this._listFilter = value;
     this.filteredProducts = this.listFilter ? this.performFilter( this.listFilter ) : this.products;
   }
   
+
   performFilter(filterBy:string):Product[]
   {
     filterBy = filterBy.toLocaleLowerCase();
@@ -103,9 +111,44 @@ filteredProducts:Product[] = [];
      * Por norma general:
      * Aqui se pondrán todas aquellas acciones que tienen que ver con las vistas
      * y los servicios.
-     *-------------------------------------------------------------------------*/    
-    this.products = this._productService.getProducts();
+     *-------------------------------------------------------------------------*/
 
-    this.filteredProducts = this.products;
-  }  
+    // Programación ASÍNCRONA, se lanza la petición y se queda 'observando' 
+    // SE SUSCRIBE AL OBSERVABLE
+
+    //--------------------------------------------------------------------------
+    // MÉTODO 1: 
+    //--------------------------------------------------------------------------
+    this.subscription =
+        this._productService.getProducts()
+          .subscribe(
+              // Caso 1: Success
+              (products) => {
+                this.products = products;
+                this.filteredProducts = this.products;
+              },
+              // Caso 2: Error
+              (error) => { alert(error) },
+              // Finally
+              () => { console.log('Finally') }
+          );
+
+    //--------------------------------------------------------------------------
+    // MÉTODO 2: más simprifica usando la notación sincrona
+    // Se define products como Observable y en el template se tiene que definir async para
+    // que funcionara de forma asyncrona.
+    // <tr *ngFor="let product of products | async">
+    // De este modo se simplica el código
+    //--------------------------------------------------------------------------
+    /*** this.products = this._productService.getProducts(); ***/
+  }
+
+
+  /*
+   * Optimización: Cuando se termina el ciclo del componente quitamos la subscripción
+   * Es un ejemplo de optimización, el socket ya se cerraría automática al destruirse el objeto.
+   */
+  ngOnDestroy(){
+    this.subscription.unsubscribe();
+  }
 }

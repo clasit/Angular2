@@ -10,7 +10,6 @@
       "assets": [
         "assets",
         "favicon.ico",
-        // Definimos nuestra carpeta de assets
         "api"
       ],
       "index": "index.html",
