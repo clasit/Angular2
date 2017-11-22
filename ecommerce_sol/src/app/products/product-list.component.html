@@ -1,0 +1,84 @@
+<div class="panel  panel-primary">
+  <!-- Default panel contents -->
+  <div class="panel-heading">
+    <span *ngIf="showTitle">{{pageTitle}}</span>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-2">Filtrar por:</div>
+      <div class="col-md-4">
+        <input type="text" [(ngModel)] = "listFilter" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        Filtrado por:{{listFilter}}
+      </div>
+    </div>
+    <div class="table-responsive">
+      <!-- Table -->
+      <table 
+        class="table"
+        *ngIf="products && products.length" >
+        <thead>
+          <tr>
+            <th>
+              <!-- boton imagen -->
+              <button class="btn btn-primary"
+                        (click) = "toggleImage()">
+                          {{showImage ? 'Ocultar' : 'Mostrar'}} Imagen
+              </button>
+            </th>
+            <th>
+              Producto
+            </th>
+            <th>
+              Codigo
+            </th>
+            <th>
+              Disponible
+            </th>
+            <th>
+              Precio
+            </th>
+            <th>
+              Popularidad
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor = "let product of filteredProducts">
+            <td>
+              <!-- imagen -->
+              <img *ngIf="showImage"
+                [src]="product.imageUrl"
+                [title] = "product.name"
+                [style.width.px] = "imageWidth"
+                [style.margin.px] = "imageMargin"
+              />
+            </td>
+            <td>
+              <a [routerLink]="['/products', product.id]">{{product.name | lowercase}}</a>
+            </td>
+            <td>
+                {{product.code | convertToSpaces:'-'}}
+            </td>
+            <td>
+                {{product.releaseDate}}
+            </td>
+            <td>
+                {{product.price | currency:'EUR':true:'1.2-2'}}
+            </td>
+            <td>
+              <!-- rating -->
+              <app-star [rating]="product.rating" 
+                        (ratingClicked)="changeView($event)"></app-star>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  
+</div>

@@ -1,0 +1,32 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        {{pageTitle}}
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+          <img src='{{product?.imageUrl}}' />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">Nombre:</div><div class="col-md-6">{{product?.name}}</div>
+    </div>    
+    <div class="row">
+        <div class="col-md-2">Lanzamiento:</div><div class="col-md-6">{{product?.releaseDate}}</div>
+    </div>
+    <div class="row">    
+        <div class="col-md-2">Precio:</div><div class="col-md-6">{{product?.price}}</div>
+    </div>
+    <div class="row">        
+        <div class="col-md-2">Descripción:</div><div class="col-md-6">{{product?.description}}</div>
+    </div>    
+    <div class="row">        
+        <div class="col-md-8">
+            <app-star [rating]="product?.rating"></app-star>
+        </div>
+    </div>    
+    <div class="panel-footer">
+       <a class="btn btn-default" (click)="back()">
+         <i class="glyphicon glyphicon-chevron-left"></i>Volver
+       </a>
+     </div>
+</div>

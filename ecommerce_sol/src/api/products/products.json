@@ -1,0 +1,32 @@
+[
+    {
+      "id":1,
+      "name":"Producto 1",
+      "code": "P-1",
+      "releaseDate": "1 de Diciembre",
+      "description": "Producto de limpieza de cocina",
+      "price": 12.90,
+      "rating": 3,
+      "imageUrl": "https://images.ssstatic.com/detergente-liquido-brisa-marina-1-5l-23766472s0-13460167.png"
+    },
+    {
+        "id":2,
+        "name":"Producto 2",
+        "code": "P-2",
+        "releaseDate": "2 de Diciembre",
+        "description": "Producto de limpieza de cocina",
+        "price": 10.00,
+        "rating": 5,
+        "imageUrl": "https://images.ssstatic.com/detergente-liquido-brisa-marina-1-5l-23766472s0-13460167.png"
+      },
+      {
+        "id":3,
+        "name":"Producto 3",
+        "code": "P-3",
+        "releaseDate": "3 de Diciembre",
+        "description": "Producto de limpieza de cocina",
+        "price": 2.90,
+        "rating": 1,
+        "imageUrl": "https://images.ssstatic.com/detergente-liquido-brisa-marina-1-5l-23766472s0-13460167.png"
+      }
+  ]
