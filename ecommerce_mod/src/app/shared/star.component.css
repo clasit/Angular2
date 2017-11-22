@@ -1,0 +1,10 @@
+.crop{
+    /* display: inline-block;
+    position: absolute;
+    border: 1px solid black; */
+    overflow: hidden;
+}
+
+.crop > div{
+    cursor: pointer;
+}

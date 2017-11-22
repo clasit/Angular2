@@ -27,7 +27,7 @@ import { ProductService } from './products/product.service';
   ],
   imports: [
     BrowserModule, FormsModule, HttpClientModule,     
-    // OJO: Como se hace la importación del router, se agregan las rutas url    
+    // OJO: Como se hace la importación del router, se agregan las rutas url   
     RouterModule.forRoot([      
       // [RUTA RAIZ]
       { path: '', redirectTo: 'products', pathMatch: "full" }, // El 'pathMatch' indica que tengamos en cuanta toda la URL

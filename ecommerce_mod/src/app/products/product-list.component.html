@@ -1,0 +1,79 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">{{pageTitle}}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+          <div class="col-md-1">
+            <span>Filter by:</span>
+          </div>
+          <div class="col-md-2">
+            <!-- Se hace un binding bidireccional ----------------------------
+            | con ngModel.
+            | La interpolación es para pasar información de la lógica a la
+            | plantilla, se hace la interpolación con {{}}
+            | Los eventos sería pasar información de la plantilla a la lógica.
+            -------------------------------------------------------------- -->
+            <input type="text" [(ngModel)]="listFilter" class="form-control"/>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+              <span>Filtered by: {{listFilter}}</span>
+            </div>
+        </div>
+        <div class="row">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>
+                    <input
+                      type="button"
+                      value="{{showImage ? 'Hide Image' : 'Show Image' }}"
+                      class="btn btn-default"
+                      (click)="toggleImage()"/>
+                  </th>
+                  <th>Product</th>
+                  <th>Code</th>
+                  <th>Avaliable</th>
+                  <th>Price</th>
+                  <th>5 Star Rating</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Iterar sobre los elementos para mostrarlos -->
+                <!-- <tr *ngFor="let product of products | async"> -->
+                <tr *ngFor="let product of filteredProducts">                    
+                  <td>
+                    <!------------------------------------------------------------------>
+                    <!-- Dos maneras para asignar a src la url de la imagen           -->
+                    <img *ngIf="showImage" 
+                      [src]="product.imageUrl"
+                      [title]="product.name"
+                      [style.width.px]="imageWidth"
+                      [style.margin.px]="imageMargin"
+                      alt="image">
+                    <!-- <img *ngIf="showImage" src={{product.imageUrl}} alt="image"> -->
+                    <!------------------------------------------------------------------>
+                  </td>                  
+                  <td>
+                    <!-- Ojo, no se pone 'href' cuando se trata de un enroudato -->
+                    <a [routerLink]="['/products', product.id]">{{product.name | uppercase}}</a>
+                  </td> 
+                  <td>{{product.code | convertToSpaces:'-'}}</td>
+                  <td>{{product.releaseDate}}</td> 
+                  <td>{{product.price | currency:'EUR':true:'1.2-2'}}</td>
+                  <td>
+                    <app-star [rating]="product.rating" 
+                      (ratingClick)="ratingChange($event, product)">
+                      <!-- El componente hijo emite un evento 'ratingClick' y ejecuta la función del padre -->
+                    </app-star>
+                  </td>
+                </tr> 
+              </tbody> 
+            </table>
+          </div>
+        </div>
+    </div>
+</div>
