@@ -1,11 +1,11 @@
 interface IAlumno{
-    id:number;
+    _id:number;
     dni:string;
-    nombre:string;
-    apellidos:string;
-    curso:string;
+    name:string;
+    surname:string;
+    curse:string;
     avatar:string;
-    notas:number[];
+    notes:number[];
 }
 
 export{ IAlumno };

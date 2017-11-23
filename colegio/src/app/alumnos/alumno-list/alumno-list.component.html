@@ -1,3 +1,54 @@
-<p>
-  alumno-list works!
-</p>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Alumnos</h3>
+    <button bnt bnt-primary block (click)="nuevoAlumno()">+</button>
+  </div>
+  <div class="panel-body">
+
+      <!-- Detalles del alumno ------------------ -->
+      <app-alumno-detail [alumno]="alumno">
+      </app-alumno-detail>
+      <!-- -------------------------------------- -->
+
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-2"></div>
+      </div>
+      <div class="row">
+          <div class="col-md-6"></div>
+      </div>
+      <div class="row">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Nombre</th>
+                <th>Dni</th>
+                <th></th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>              
+              <tr *ngFor="let alumno of alumnos">                    
+                <td>                  
+                  <img
+                    [src]="alumno.avatar"
+                    [title]="alumno.name"
+                    alt="image">                  
+                </td>                  
+                <td>
+                  <!-- <a [routerLink]="['/alumno', alumno._id]">{{alumno.name}}</a> -->
+                  <a (click)="getDetailAlumno(alumno)" >{{alumno.name}}</a>
+                </td> 
+                <td>{{alumno.dni}}</td>
+                <td>{{alumno.curse}}</td> 
+                <td>{{alumno.notes}}</td>
+              </tr> 
+            </tbody> 
+          </table>
+        </div>
+      </div>
+  </div>
+</div>
