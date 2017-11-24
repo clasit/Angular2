@@ -8,26 +8,28 @@ import { AlumnoService } from './services/alumno.service';
 
 import { FormsModule } from '@angular/forms';
 import { AlumnoSearchComponent } from './alumno-search/alumno-search.component';
+import { AlumnoFormComponent } from './alumno-form/alumno-form.component';
 
 @NgModule({
-  declarations: [    
+  declarations: [
     AlumnoListComponent,
-    AlumnoDetailComponent,    
-    AlumnoSearchComponent
+    AlumnoDetailComponent,
+    AlumnoSearchComponent,
+    AlumnoFormComponent
   ],
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     RouterModule.forChild([
+      {path: 'form', component: AlumnoFormComponent},
       {path: 'alumnos', component: AlumnoListComponent},
       {path: 'alumno/:alumno', component: AlumnoDetailComponent}
   ])
   ],
   // Para usarlos los tendremos que exportar o directamente cargarlos con el routing...
-  exports:[AlumnoListComponent, AlumnoDetailComponent, AlumnoSearchComponent],
+  exports: [AlumnoListComponent, AlumnoDetailComponent, AlumnoSearchComponent, AlumnoFormComponent],
   /* No haría falta exportarlos, se cargan mediante el router */
-
   providers: [AlumnoService]
 })
 
-export class AlumnoModule { }
+export class AlumnoModule {}

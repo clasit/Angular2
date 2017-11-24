@@ -4,6 +4,7 @@ import { AlumnoService } from '../services/alumno.service';
 
 import { error } from 'util';
 import { Observable } from 'rxjs/Observable';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-alumno-list',
@@ -20,12 +21,11 @@ export class AlumnoListComponent implements OnInit {
   private alumno:IAlumno;
   private alumnos:IAlumno[];
 
-  
 
-  constructor( private _alumnoService: AlumnoService ) {
+  constructor( private _alumnoService: AlumnoService,
+               private _router: Router ) {
   }
 
-  
   getDetailAlumno(alumno){
     // ¿ Como pasar el alumno al componente alumno-detail (mediante un 'Input') ?
     console.log( alumno );
@@ -41,24 +41,38 @@ export class AlumnoListComponent implements OnInit {
   }
 
 
-  /*
-   * Añadimos un nuevo alumno
-   */
   nuevoAlumno(){
-    let alumno = {
-      _id: 777,
-      dni: '20464767P',
-      name: 'Jesús',
-      surname: 'Muñoz Fortuño',
-      curse: 'Angular2',
-      avatar: '',
-      notes: [6, 7, 7, 5]
-    }
+    this._router.navigate(['/form']);
+  }
 
-    console.log(alumno);
 
-    // Se modifica, pero no se refresca, tendremos que actualziar
-    // la lista con Subject y Subject suscriber...    
-    this._alumnoService.setAlumno(alumno);    
+  /*
+   *
+   */
+  borrarAlumno(alumno: IAlumno) {
+    this._alumnoService.removeAlumno(alumno);
+  }
+
+
+  /*
+   *
+   */
+  editarAlumno(alumno: IAlumno) {
+    // Se tendrána que cargar los datos en el formulario
+
+    /*
+    alumno.name = 'Modificado';
+    this._alumnoService
+      .updateAlumno(alumno)
+      .subscribe(
+        res => {
+          if (res) {
+            console.log('Modificación correcta');
+          }else {
+            console.log('Error en modificación');
+          }
+        }
+      );
+    */
   }
 }

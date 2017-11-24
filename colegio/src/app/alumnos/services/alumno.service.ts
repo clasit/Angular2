@@ -1,16 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
 
 import { IAlumno } from '../interfaces/alumno.interface';
 
 
+
 @Injectable()
 export class AlumnoService {
 
   private alumnos:IAlumno[];
+  private subject:Subject<IAlumno[]> = new Subject<IAlumno[]>();
   private URL:string = "http://192.168.4.3:3000/alumns";
 
   
@@ -22,6 +25,10 @@ export class AlumnoService {
     this._http.get<IAlumno[]>(this.URL).subscribe(
         (alumnos) => {
             this.alumnos = alumnos;
+
+            // La función next emite un nuevo evento
+            this.subject.next(this.alumnos);
+
             localStorage.setItem('alumnos', JSON.stringify(this.alumnos) );
         },
         (error) => { alert('Imposible leer los datos') }
@@ -34,7 +41,12 @@ export class AlumnoService {
   getAlumnos():Observable<IAlumno[]>{
     // return this._http.get<IAlumno[]>(this.URL);
     this.alumnos = JSON.parse(localStorage.getItem('alumnos')) || [];
-    return Observable.of( this.alumnos );
+    
+    // Devuleve un observable (permitiendo la subscripción)
+    // return Observable.of( this.alumnos );
+
+    // Devuelve el subject como un observable
+    return this.subject.asObservable()
   }
 
 
@@ -54,9 +66,9 @@ export class AlumnoService {
   //------------------------------------------------------------------------
   // Persistencia en Local Storage =========================================
   //------------------------------------------------------------------------
-  setAlumno(al: IAlumno):Observable<boolean>{
+  setAlumno(al: IAlumno): Observable<boolean> {
 
-    try{
+    try {
       // (1) Recuperar la colección de todos los alumnos
       this.alumnos = JSON.parse(localStorage.getItem('alumnos')) || [];   // localStorage es un méditod de HTML5
 
@@ -66,11 +78,14 @@ export class AlumnoService {
       // (3) Persistir la colección modificada
       localStorage.setItem( 'alumnos', JSON.stringify(this.alumnos) );
 
+      // Se vuelve a enviar un pulso
+      this.subject.next(this.alumnos);
+
       return Observable.of(true);
-    }catch(ex){
+    }catch (ex) {
       return Observable.of(false);
-    }    
-  }  
+    }
+  }
 
 
 
@@ -81,9 +96,13 @@ export class AlumnoService {
     // (2) Si find devuelve una referencia se podría importar directamente
     let alumno = this.alumnos.find( (item) => item.dni == al.dni );
 
-    if ( alumno !== null ){
-      let index = this.alumnos.indexOf(alumno);
+    if ( alumno !== null ) {
+      const index = this.alumnos.indexOf(alumno);
       this.alumnos[index] = al;
+
+      // Se vuelve a enviar un pulso
+      this.subject.next(this.alumnos);
+
       localStorage.setItem( 'alumnos', JSON.stringify(this.alumnos) );
     }
 
@@ -97,11 +116,15 @@ export class AlumnoService {
     this.alumnos = JSON.parse(localStorage.getItem('alumnos')) || [];
 
     // (2) Si find devuelve una referencia se podría importar directamente
-    let alumno = this.alumnos.find( (item) => item.dni == al.dni );
+    let alumno = this.alumnos.find( (item) => item.dni == al.dni );    
 
-    if ( alumno !== null ){
+    if ( alumno !== null ){      
       let index = this.alumnos.indexOf(alumno);
-      this.alumnos.slice(index, 1);
+      this.alumnos.splice(index, 1);
+
+      // Se vuelve a enviar un pulso. El que esté subscrito en getAlumnos se le informa.
+      this.subject.next(this.alumnos);
+
       localStorage.setItem( 'alumnos', JSON.stringify(this.alumnos) );
     }
 

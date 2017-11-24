@@ -1,13 +1,18 @@
 <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title">Alumnos</h3>
+
+    <!-- Enrutado mediante función -->
     <button bnt bnt-primary block (click)="nuevoAlumno()">+</button>
+
+    <!-- Enrutado enlace  ------------------>
+    <a [routerLink]="['/form']">Insertar</a>
+
   </div>
   <div class="panel-body">
 
       <!-- Detalles del alumno ------------------ -->
-      <app-alumno-detail [alumno]="alumno">
-      </app-alumno-detail>
+      <app-alumno-detail [alumno]="alumno"></app-alumno-detail>
       <!-- -------------------------------------- -->
 
       <div class="row">
@@ -45,6 +50,10 @@
                 <td>{{alumno.dni}}</td>
                 <td>{{alumno.curse}}</td> 
                 <td>{{alumno.notes}}</td>
+                <td>
+                  <button bnt bnt-primary block (click)="borrarAlumno(alumno)">-</button>
+                  <button bnt bnt-primary block (click)="editarAlumno(alumno)">e</button>
+                </td>
               </tr> 
             </tbody> 
           </table>

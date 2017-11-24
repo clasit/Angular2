@@ -1,0 +1,29 @@
+<!-- -------------------------------------------------------------------------------
+Para definir un formulario definido en plantillas se tendrá que identificar
+el formulario con #fromRef y el evento ngSubmit
+-------------------------------------------------------------------------------- -->
+
+<form #fromRef="ngForm" 
+      (ngSubmit)="guardarDatos(fromRef.value)" 
+      novalidate> <!-- -->
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <!-- ------------------------------------------------------------------------
+        Para los formularios basados en plantillas, se dentrá que definicr
+           name y ngModel para cada uno de los inputs que queramos recoger 
+      ------------------------------------------------------------------------- -->
+      <label>Dni</label>
+      <input type="text" class="form-control" name="dni" ngModel #dni="ngModel" required>
+      <span class="label label-danger"
+        *ngIf="dni.touched && dni.errors?.required">  <!-- touched, significa que ha recibido el focos -->
+        El dni es obligatorio
+      </span>
+
+      <label>Name</label><input type="text" class="form-control" name="name" ngModel>
+      <label>Surname</label><input type="text" class="form-control" name="surname" ngModel>
+      <label>Curse</label><input type="text" class="form-control" name="curse" ngModel>
+
+      <button type="submit" class="btn btn-primary" [disabled]="fromRef.invalid">Guardar</button>
+    </div>
+  </div>  
+</form>
