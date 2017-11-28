@@ -1,0 +1,17 @@
+<mat-grid-list cols="4" rowHeight="100px">
+  <mat-grid-tile
+      *ngFor="let photo of photos"
+      [colspan]="cols"
+      [rowspan]="rows"
+      [style.background]="color">
+
+    <!-- Estos parámetros se tendrán que dibujar con el componente 'app-photo' -->
+    <img [src]="photo.thumbnailUrl" alt="Photo missing"/>
+    <span>{{photo.title}}</span>
+
+    <!-- Cart element ------------------------------------------------------------>
+    <!-- <app-photo></app-photo> -->
+    <!---------------------------------------------------------------------------->
+
+  </mat-grid-tile>
+</mat-grid-list>
