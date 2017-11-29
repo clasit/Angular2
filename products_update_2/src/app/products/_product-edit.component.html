@@ -6,10 +6,11 @@
     <div class="panel-body">
         <form class="form-horizontal"
               novalidate
-              (ngSubmit)="saveProduct()"
-              [formGroup]="productForm"
-               >
+              (ngSubmit)="saveProduct()"              
+              [formGroup]="productForm">
+              <!-- (1) Para que un formulario sea reactivo se tiene que vincular el formulario con formGroup -->
             <fieldset>
+                <!-- (2) Bincular el campo por código -->
                 <div class="form-group" 
                      [ngClass]="{'has-error': displayMessage.productName }">
                     <label class="col-md-2 control-label" for="productNameId">Product Name</label>
@@ -19,8 +20,7 @@
                                 id="productNameId" 
                                 type="text" 
                                 placeholder="Name (required)" 
-                                formControlName="productName"
-                                 />
+                                formControlName="productName"/>
                         <span class="help-block" *ngIf="displayMessage.productName">
                                 {{displayMessage.productName}}
                         </span>
@@ -35,9 +35,8 @@
                         <input class="form-control" 
                                 id="productCodeId" 
                                 type="text" 
-                                placeholder="Code (required)"
-                                formControlName="productCode" 
-                                 />
+                                placeholder="Code (required)" 
+                                formControlName="productCode"/>
                         <span class="help-block" *ngIf="displayMessage.productCode">
                                 {{displayMessage.productCode}}
                         </span>
@@ -52,13 +51,14 @@
                                 id="starRatingId" 
                                 type="text" 
                                 placeholder="Rating" 
-                                formControlName="starRating" />
+                                formControlName="starRating"/>
                         <span class="help-block" *ngIf="displayMessage.starRating">
                                 {{displayMessage.starRating}}
                         </span>
                     </div>
                 </div>
                 
+                <!-- (3) Bincular array de valores -->
                 <div formArrayName="tags">
                     <div class="row">
                         <button class="col-md-offset-1 col-md-1 btn btn-default"
@@ -69,14 +69,12 @@
                     <div class="form-group"
                         *ngFor="let tag of tags.controls; let i=index" >
                         <label class="col-md-2 control-label" [attr.for]="i">Tag</label>
-
                         <div class="col-md-8">
                             <input class="form-control" 
                                     [id]="i" 
                                     type="text" 
                                     placeholder="Tag" 
-                                    [formControlName]="i"
-                                     />
+                                    [formControlName]="i"/>
                         </div>
                     </div>
                 </div>
@@ -89,8 +87,7 @@
                                 id="descriptionId" 
                                 placeholder="Description"
                                 rows=3
-                                formControlName="description"
-                                ></textarea>
+                                formControlName="description"></textarea>
                         <span class="help-block" *ngIf="displayMessage.description">
                                 {{ displayMessage.description}}
                         </span>

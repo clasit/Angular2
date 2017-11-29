@@ -18,6 +18,7 @@ var product_filter_pipe_1 = require("./product-filter.pipe");
 var product_service_1 = require("./product.service");
 var shared_module_1 = require("../shared/shared.module");
 var forms_1 = require("@angular/forms");
+var product_guard_service_1 = require("./product-guard.service");
 var ProductModule = (function () {
     function ProductModule() {
     }
@@ -33,9 +34,12 @@ ProductModule = __decorate([
             router_1.RouterModule.forChild([
                 { path: 'products', component: product_list_component_1.ProductListComponent },
                 { path: 'product/:id',
+                    // Incorporamos el servicio Guard de entrada al detalle
+                    canActivate: [product_guard_service_1.ProductDetailGuard],
                     component: product_detail_component_1.ProductDetailComponent
                 },
                 { path: 'productEdit/:id',
+                    canDeactivate: [product_guard_service_1.ProductEditGuard],
                     component: product_edit_component_1.ProductEditComponent },
             ])
         ],
@@ -47,6 +51,8 @@ ProductModule = __decorate([
         ],
         providers: [
             product_service_1.ProductService,
+            product_guard_service_1.ProductDetailGuard,
+            product_guard_service_1.ProductEditGuard
         ]
     })
 ], ProductModule);

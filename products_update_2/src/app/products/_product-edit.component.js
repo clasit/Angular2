@@ -16,15 +16,18 @@ require("rxjs/add/observable/fromEvent");
 require("rxjs/add/observable/merge");
 var Observable_1 = require("rxjs/Observable");
 var product_service_1 = require("./product.service");
+// Custom validators. Están el módulo Shared para compartir poder reutilizarlos
 var number_validator_1 = require("../shared/number.validator");
 var generic_validator_1 = require("../shared/generic-validator");
 var ProductEditComponent = (function () {
-    function ProductEditComponent(//TODO,
-        fb, route, router, productService) {
+    function ProductEditComponent(fb, // Inyecta FormBuilder para poder manipular el formulario
+        route, router, productService) {
         this.fb = fb;
         this.route = route;
         this.router = router;
         this.productService = productService;
+        // Otro ejemplo con 'ViewChild' (Toma sólo un elemento)
+        // @ViewChild(StartRating) star: StarRating;
         this.pageTitle = 'Product Edit';
         // Use with the generic validation message class
         this.displayMessage = {};
@@ -56,16 +59,17 @@ var ProductEditComponent = (function () {
     });
     ProductEditComponent.prototype.ngOnInit = function () {
         var _this = this;
-        //TODO: init form builder
-        // El validador de starRating es un custom validador
+        // Inicialzación del Formulario Reactivo
         this.productForm = this.fb.group({
             productName: ['', [forms_1.Validators.required, forms_1.Validators.minLength(3), forms_1.Validators.maxLength(50)]],
             productCode: ['', forms_1.Validators.required],
-            starRating: ['', [number_validator_1.NumberValidators.range(1, 5)]],
+            startRating: ['', [number_validator_1.NumberValidators.range(1, 5)]],
             tags: this.fb.array([]),
-            description: ''
+            description: '' // No tiene validadores, no hará falta ponerlo en forma de Array
         });
         // Read the product Id from the route parameter
+        // Observación del parámetro id de la url (observable)
+        // Cada vez que hay un cambio de lanza la función getProduct
         this.sub = this.route.params.subscribe(function (params) {
             var id = +params['id'];
             _this.getProduct(id);
@@ -74,105 +78,108 @@ var ProductEditComponent = (function () {
     ProductEditComponent.prototype.ngOnDestroy = function () {
         this.sub.unsubscribe();
     };
-    // Método del ciclo de vida del Angular que se ejecuta cuando se han cargado todas las vistas del componente
+    /*
+     * Ciclo de Vida de un Componente
+     * Lifecycle hook that is called after a component's view has been fully initialized.
+     */
     ProductEditComponent.prototype.ngAfterViewInit = function () {
         var _this = this;
-        //TODO
-        // Control de eventos 'pérdida de foco'
-        // Vamos a suscribirnos a los cambios de los elementos del formulario que transformaremos con 'map'
+        // Observar los cambios de TODOS los campos del formulario
+        // map: genera un nuevo array aplicando una transformación sobre los elementos
+        // Genera un array de Observable para los eventos de pérdida de foco del formulario.
+        // A partir de 
         var controlBlurs = this.formInputElements.map(function (formControl) {
-            // Nos vamos a suscribir a cada elemento que pierda el foco y lo ponemos en un array llamado controlBlurs
+            // Con map genera un nuevo array transformado
             return Observable_1.Observable.fromEvent(formControl.nativeElement, 'blur');
         });
-        // Array de observables de los cambios de los campos del formulario
-        var array = [this.productForm.valueChanges];
-        // Mezclamos los 2 observables de tiempo que ya están juntados en el array, porque tienen2 tipos de eventos diferentes
-        // Esperamos 800 milisegundos entre evento y evento
-        Observable_1.Observable.merge.apply(Observable_1.Observable, [array].concat(controlBlurs)).debounceTime(800).subscribe(function (value) {
-            _this.displayMessage = _this.genericValidator.processMessages(_this.productForm);
-        });
+        // Concatenación de arrays
+        // let array: Observable<FormControl>[] = [ this.productForm.valueChanges, ...controlBlurs ];
+        // Unimos las 2 líneas de Observables.
+        // También es un array de observables que escucha los cambios en el valor
+        // Espera 800 ms para no saturar el formulario
+        // Con merge engoblamos los 2 arrays en un obervable para poder subscribirnos
+        Observable_1.Observable.merge.apply(Observable_1.Observable, [this.productForm.valueChanges].concat(controlBlurs)).debounceTime(800)
+            .subscribe(function (value) { _this.displayMessage = _this.genericValidator.processMessages(_this.productForm); });
+        // ------------------------------------------------------------
+        // EJEMPLO DE OBSERVABLES -------------------------------------
+        // ------------------------------------------------------------
+        /* // (1) Crea un Observable sobre un array
+            let x: Observable<number[]> = Observable.of([1, 2, 3]);
+        // (2) Se subscribe a los cambios
+            x.subscribe( (data) => { console.log('data', data); } );
+        // (3) Al modificar el array se ejecutará la función a la que está subscrito
+            x[0] = 3; */
+        // ------------------------------------------------------------
     };
     ProductEditComponent.prototype.addTag = function () {
         this.tags.push(new forms_1.FormControl());
     };
     ProductEditComponent.prototype.getProduct = function (id) {
         var _this = this;
-        //TODO
-        this.productService.getProduct(id).subscribe(function (product) {
-            _this.onProductRetrieved(product);
-        }, function (error) {
-            _this.errorMessage = error;
-            console.log('Error al recuperar el producto: ', error);
-        });
+        // Cada vez que hay un cambio de ID se ejecuta esta función
+        this.productService.getProduct(id)
+            .subscribe(
+        // Cuando me llega el producto desde el servicio se ejecutará 'onProductRetrieved'
+        function (product) { return _this.onProductRetrieved(product); }, function (error) { return _this.errorMessage = error; });
     };
     ProductEditComponent.prototype.onProductRetrieved = function (product) {
-        //TODO
-        this.productForm.reset(); // Eliminamos los valores de los campos del formulario
+        // Borra el formulario
+        this.productForm.reset();
         this.product = product;
-        // Saber si estoy en alta o edición del producto
+        // Para informar al usuario si estamos en una alta o una modificación
         if (this.product.id === 0) {
-            this.pageTitle = 'Alta de producto';
+            this.pageTitle = 'Add Product';
         }
         else {
-            this.pageTitle = 'Modificación de producto';
+            this.pageTitle = "Edit Product: " + this.product.productName;
         }
-        // Cargar los datos en el formulario
-        // patchValue: Carga parcial de los elementos de un formulario
+        // Carga el producto en el formulario
         this.productForm.patchValue({
             productName: this.product.productName,
             productCode: this.product.productCode,
-            starRating: this.product.starRating,
-            description: this.product.description,
+            startRating: this.product.starRating,
+            description: this.product.description
         });
+        // Como es un array se tinen que hacer a parte.
         this.productForm.setControl('tags', this.fb.array(this.product.tags || []));
     };
     ProductEditComponent.prototype.deleteProduct = function () {
         var _this = this;
-        //TODO: distinguir entre altas y ediciones...
+        // ¿Está en modo de alta o edición?
         if (this.product.id === 0) {
             this.onSaveComplete();
         }
         if (confirm("Seguro que quiere borrar el producto " + this.product.productName)) {
-            this.productService.deleteProduct(this.product.id).subscribe(function () {
-                _this.onSaveComplete();
-            }, function (error) {
-                _this.errorMessage = error;
-                console.log('Error al borrar el producto: ', error);
-            });
+            this.productService.deleteProduct(this.product.id)
+                .subscribe(function () { return _this.onSaveComplete(); }, function (error) { return _this.errorMessage = error; });
         }
-        ;
     };
     ProductEditComponent.prototype.saveProduct = function () {
         var _this = this;
-        //TODO
-        // Controlamos si se ha tocado algún campo del formulario
+        // (1) Comprobamos si hemos manipulados datos del formulario y que es válido
         if (this.productForm.dirty && this.productForm.valid) {
-            // Recogemos el JSON de los valores del formulario
-            // assign(): Va de derecha a izaquierda, almacenando los datos ->
-            // this.productForm.value se asigna a la variable this.prodcut que tiene tipo IPproduct
-            // y finalmente lo agregamos al objeto vacío {}
-            //let product: IProduct = Object.assign({}, this.product, this.productForm.value);
-            this.product = Object.assign({}, this.product, this.productForm.value);
-            this.productService.saveProduct(this.product).subscribe(function () {
-                _this.onSaveComplete();
-            }, function (error) {
-                console.log('error: ', error);
-                _this.errorMessage = error;
-            });
+            // (2) Recogemos los datos del formulario
+            // Pasa los parámetros del 'productForm.value' a 'this.product' y luego el resultado a {}
+            // La primera parte suele ser el objeto vacío.
+            // NOTA: this.product también se modifica en este por la función assign.
+            var product = Object.assign({}, this.product, this.productForm.value);
+            // IMPORTANTE: Si una función devulte un observable, SÓLO SE EJECUTA SI HACEMOS SUBSCRIBE
+            this.productService.saveProduct(product)
+                .subscribe(function () { }, function (error) { _this.errorMessage = error; });
         }
     };
     ProductEditComponent.prototype.onSaveComplete = function () {
-        // Reset the form to clear the flags 
-        // y se va al listado de productos
-        //TODO
-        this.productForm.reset();
+        // Reset the form to clear the flags
+        // (A) Borra el formulario
+        // this.productForm.reset();
+        // (B) Navega a la lista de productos
         this.router.navigate(['/products']);
     };
     return ProductEditComponent;
 }());
 __decorate([
     core_1.ViewChildren(forms_1.FormControlName, { read: core_1.ElementRef }),
-    __metadata("design:type", Array)
+    __metadata("design:type", core_1.QueryList)
 ], ProductEditComponent.prototype, "formInputElements", void 0);
 ProductEditComponent = __decorate([
     core_1.Component({
@@ -184,4 +191,4 @@ ProductEditComponent = __decorate([
         product_service_1.ProductService])
 ], ProductEditComponent);
 exports.ProductEditComponent = ProductEditComponent;
-//# sourceMappingURL=product-edit.component.js.map
+//# sourceMappingURL=_product-edit.component.js.map

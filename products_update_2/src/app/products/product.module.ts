@@ -16,6 +16,7 @@ import { ProductService } from './product.service';
 
 import { SharedModule } from '../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ProductDetailGuard, ProductEditGuard } from './product-guard.service';
 
 
 @NgModule({
@@ -27,9 +28,12 @@ import { ReactiveFormsModule } from '@angular/forms';
     RouterModule.forChild([
       { path: 'products', component: ProductListComponent },
       { path: 'product/:id',  // Alta o edición ( id == 0 ==> 'ALTA' )
+        // Incorporamos el servicio Guard de entrada al detalle
+        canActivate: [ProductDetailGuard],
         component: ProductDetailComponent
       },
       { path: 'productEdit/:id',
+        canDeactivate: [ProductEditGuard],
         component: ProductEditComponent },
     ])
   ],
@@ -41,6 +45,8 @@ import { ReactiveFormsModule } from '@angular/forms';
   ],
   providers: [
     ProductService,
+    ProductDetailGuard,  // (!) Ojo, se tiene que insertar también en providers
+    ProductEditGuard
   ]
 })
 export class ProductModule {}

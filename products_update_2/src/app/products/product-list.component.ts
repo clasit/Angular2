@@ -26,6 +26,9 @@ export class ProductListComponent implements OnInit {
     }
 
     ngOnInit(): void {
+
+        // La inserción de la palabra reservada debugger, pone un breakpoint
+        // debugger;
         this.productService.getProducts()
                 .subscribe(products => this.products = products,
                            error => this.errorMessage = <any>error);

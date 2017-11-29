@@ -5,7 +5,7 @@ var ProductData = (function () {
     ProductData.prototype.createDb = function () {
         var products = [
             {
-                'id': 1,
+                'id': -1,
                 'productName': 'Leaf Rake',
                 'productCode': 'GDN-0011',
                 'releaseDate': 'March 19, 2016',

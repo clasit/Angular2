@@ -11,63 +11,47 @@ import { Subscription } from 'rxjs/Subscription';
 import { IProduct } from './product';
 import { ProductService } from './product.service';
 
-// Custom validators. Están el módulo Shared para compartir poder reutilizarlos
 import { NumberValidators } from '../shared/number.validator';
 import { GenericValidator } from '../shared/generic-validator';
-import { error } from 'util';
-
 
 @Component({
     templateUrl: 'app/products/product-edit.component.html'
 })
 export class ProductEditComponent implements OnInit, AfterViewInit, OnDestroy {
+    /*
+    Forma de tener en código algunos elementos que están en la template.
+    Crea una coleccion de elementos de tipo FormControlName para poder acceder directamente
+    con ese elemento en el DOM y los pondrá en un array llamado 'formInputElements' 
+    de tipo genérico 'ElementRef'.
+    Sólo los elementos que hayamos puesto con el atributo 'FormControlName'
+    */
 
-/*--------------------------------------------------------------------------------------
- * @ViewChildren. No tiene que ver con el formulario, sirve para tener acceso a los
- * elemtos que se tienen en la template.
- * Pone todos los elemento que tienen el 'FormControlName' en un array de elementos llamado 
- * 'formInputElements'. Es como hacer una query en el DOM.
- *-------------------------------------------------------------------------------------*/
-    @ViewChildren(FormControlName, { read: ElementRef }) 
-    formInputElements: QueryList<ElementRef>;
-
-    // Otro ejemplo con 'ViewChild' (Toma sólo un elemento)
-    // @ViewChild(StartRating) star: StarRating;
+    //@ViewChildren(FormControlName, { read: ElementRef }) formInputElements: QueryList<ElementRef>;
+    @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: ElementRef[];
 
     pageTitle: string = 'Product Edit';
     errorMessage: string;
-
-    // Declaración del formulario 'reactivo'. Esta variable representa el formulario.
+    //TODO: form group...
     productForm: FormGroup;
-
-/*--------------------------------------------------------------------------------------
- * FormBuilder: No es obligatiorio para los formularios reactivos, pero si recomendable.
- * FormGroup: El formulario.
- * FormControl: Campos del formulario.
- * FormArray: Campos del formulario en formato array.
- * Validators: Validación del formulario.
- * FormControlName: Vinculación por nombre del campo del formulario
- *------------------------------------------------------------------------------------*/
 
     product: IProduct;
     private sub: Subscription;
-
 
     // Use with the generic validation message class
     displayMessage: { [key: string]: string } = {};
     private validationMessages: { [key: string]: { [key: string]: string } };
     private genericValidator: GenericValidator;
 
-
     get tags(): FormArray {
         return <FormArray>this.productForm.get('tags');
     }
 
-
-    constructor(private fb: FormBuilder,   // Inyecta FormBuilder para poder manipular el formulario
-                private route: ActivatedRoute,
-                private router: Router,
-                private productService: ProductService) {
+    constructor(//TODO,
+        private fb: FormBuilder,
+        private route: ActivatedRoute,
+        private router: Router,
+        private productService: ProductService,
+    ) {
 
         // Defines all of the validation messages for the form.
         // These could instead be retrieved from a file or database.
@@ -91,19 +75,17 @@ export class ProductEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
-
-        // Inicialzación del Formulario Reactivo
+        //TODO: init form builder
+        // El validador de starRating es un custom validador
         this.productForm = this.fb.group({
             productName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-            productCode: ['', Validators.required],
-            startRating: ['', [NumberValidators.range(1, 5)]],
+            productCode: ['',Validators.required],
+            starRating: ['',[NumberValidators.range(1, 5)]],
             tags: this.fb.array([]),
-            description: '' // No tiene validadores, no hará falta ponerlo en forma de Array
+            description: ''
         });
 
         // Read the product Id from the route parameter
-        // Observación del parámetro id de la url (observable)
-        // Cada vez que hay un cambio de lanza la función getProduct
         this.sub = this.route.params.subscribe(
             params => {
                 let id = +params['id'];
@@ -116,46 +98,30 @@ export class ProductEditComponent implements OnInit, AfterViewInit, OnDestroy {
         this.sub.unsubscribe();
     }
 
-
-    /* 
-     * Ciclo de Vida de un Componente
-     * Lifecycle hook that is called after a component's view has been fully initialized.
-     */
+    // Método del ciclo de vida del Angular que se ejecuta cuando se han cargado todas las vistas del componente
     ngAfterViewInit(): void {
-
-        // Observar los cambios de TODOS los campos del formulario
-        // map: genera un nuevo array aplicando una transformación sobre los elementos
-        // Genera un array de Observable para los eventos de pérdida de foco del formulario.
-        // A partir de 
+        //TODO
+        // Control de eventos 'pérdida de foco'
+        // Vamos a suscribirnos a los cambios de los elementos del formulario que transformaremos con 'map'
         let controlBlurs: Observable<FormControl>[] = this.formInputElements.map(
             (formControl: ElementRef) => {
-                // Con map genera un nuevo array transformado
+                // Nos vamos a suscribir a cada elemento que pierda el foco y lo ponemos en un array llamado controlBlurs
                 return Observable.fromEvent(formControl.nativeElement, 'blur');
-            });
-
-        // Concatenación de arrays
-        // let array: Observable<FormControl>[] = [ this.productForm.valueChanges, ...controlBlurs ];
-
-        // Unimos las 2 líneas de Observables.
-        // También es un array de observables que escucha los cambios en el valor
-        // Espera 800 ms para no saturar el formulario
-        // Con merge engoblamos los 2 arrays en un obervable para poder subscribirnos
-        Observable.merge( this.productForm.valueChanges, ...controlBlurs ).debounceTime(800)
-            .subscribe(
-                (value) => { this.displayMessage = this.genericValidator.processMessages(this.productForm); }
+            }
         );
 
+        // Array de observables de los cambios de los campos del formulario
+        let array: Observable<FormControl>[] = [this.productForm.valueChanges];
 
-        // ------------------------------------------------------------
-        // EJEMPLO DE OBSERVABLES -------------------------------------
-        // ------------------------------------------------------------
-        /* // (1) Crea un Observable sobre un array
-            let x: Observable<number[]> = Observable.of([1, 2, 3]);
-        // (2) Se subscribe a los cambios
-            x.subscribe( (data) => { console.log('data', data); } );
-        // (3) Al modificar el array se ejecutará la función a la que está subscrito
-            x[0] = 3; */
-        // ------------------------------------------------------------
+        // Mezclamos los 2 observables de tiempo que ya están juntados en el array, porque tienen2 tipos de eventos diferentes
+        // Esperamos 800 milisegundos entre evento y evento
+        Observable.merge(array, ...controlBlurs).debounceTime(800).subscribe(
+            value => {
+                this.displayMessage = this.genericValidator.processMessages(this.productForm);
+            }
+        );
+
+        
     }
 
     addTag(): void {
@@ -163,82 +129,86 @@ export class ProductEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     getProduct(id: number): void {
-        // Cada vez que hay un cambio de ID se ejecuta esta función
-        this.productService.getProduct(id)
-        .subscribe(
-            // Cuando me llega el producto desde el servicio se ejecutará 'onProductRetrieved'
-            (product: IProduct) => this.onProductRetrieved(product),
-            (error: any) => this.errorMessage = <any>error
+        //TODO
+        this.productService.getProduct(id).subscribe(
+            (product: IProduct) => {
+                this.onProductRetrieved(product);
+            }, (error: any) => {
+                this.errorMessage = error;
+                console.log('Error al recuperar el producto: ', error);
+            }
         );
     }
 
     onProductRetrieved(product: IProduct): void {
-        // Borra el formulario
-        this.productForm.reset();
-
+        //TODO
+        this.productForm.reset(); // Eliminamos los valores de los campos del formulario
         this.product = product;
 
-        // Para informar al usuario si estamos en una alta o una modificación
-        if (this.product.id === 0) {    // ALTA
-            this.pageTitle = 'Add Product';
-        } else {                        // MODIFICACIÓN
-            this.pageTitle = `Edit Product: ${this.product.productName}`;
+        // Saber si estoy en alta o edición del producto
+        if (this.product.id === 0) { // Alta
+            this.pageTitle = 'Alta de producto';
+        }else {
+            this.pageTitle = 'Modificación de producto';
         }
 
-        // Carga el producto en el formulario
-        this.productForm.patchValue({   // No se usa 'setValue' por que no se utilizarn todos los campo. Falta tags.
+        // Cargar los datos en el formulario
+        // patchValue: Carga parcial de los elementos de un formulario
+        this.productForm.patchValue({ 
             productName: this.product.productName,
             productCode: this.product.productCode,
-            startRating: this.product.starRating,
-            description: this.product.description
+            starRating: this.product.starRating,
+            description: this.product.description,
         });
 
-        // Como es un array se tinen que hacer a parte.
         this.productForm.setControl('tags', this.fb.array(this.product.tags || []));
     }
 
     deleteProduct(): void {
-
-        // ¿Está en modo de alta o edición?
-        if ( this.product.id === 0 ) {
+        //TODO: distinguir entre altas y ediciones...
+        if (this.product.id === 0) {
             this.onSaveComplete();
         }
-
-        if ( confirm(`Seguro que quiere borrar el producto ${this.product.productName}`) ) {
-            this.productService.deleteProduct( this.product.id )
-                .subscribe(
-                    () => this.onSaveComplete(),
-                    error => this.errorMessage = error
-                );
-        }
+        if (confirm(`Seguro que quiere borrar el producto ${this.product.productName}`)) {
+            this.productService.deleteProduct(this.product.id).subscribe(
+                () => {
+                    this.onSaveComplete();
+                }, (error: any) => {
+                    this.errorMessage = error;
+                    console.log('Error al borrar el producto: ', <any>error);
+                }
+            );
+        };
     }
 
     saveProduct(): void {
-        // (1) Comprobamos si hemos manipulados datos del formulario y que es válido
-        if ( this.productForm.dirty && this.productForm.valid ) {
+        //TODO
+        // Controlamos si se ha tocado algún campo del formulario
+        if (this.productForm.dirty && this.productForm.valid) {
+            // Recogemos el JSON de los valores del formulario
+            // assign(): Va de derecha a izaquierda, almacenando los datos ->
+            // this.productForm.value se asigna a la variable this.prodcut que tiene tipo IPproduct
+            // y finalmente lo agregamos al objeto vacío {}
 
-            // (2) Recogemos los datos del formulario
-            // Pasa los parámetros del 'productForm.value' a 'this.product' y luego el resultado a {}
-            // La primera parte suele ser el objeto vacío.
-            // NOTA: this.product también se modifica en este por la función assign.
-            let product = Object.assign({}, this.product, this.productForm.value);
+            //let product: IProduct = Object.assign({}, this.product, this.productForm.value);
+            this.product = Object.assign({}, this.product, this.productForm.value);
 
-            // IMPORTANTE: Si una función devulte un observable, SÓLO SE EJECUTA SI HACEMOS SUBSCRIBE
-            this.productService.saveProduct(product)
-                .subscribe(
-                    () => {},
-                    (error) => { this.errorMessage = error; }
-                );
+            this.productService.saveProduct(this.product).subscribe(
+                () => {
+                    this.onSaveComplete();
+                }, (error: any) => {
+                    console.log('error: ', error);
+                    this.errorMessage = error;
+                }
+            );
         }
     }
 
     onSaveComplete(): void {
-        // Reset the form to clear the flags
-
-        // (A) Borra el formulario
-        // this.productForm.reset();
-
-        // (B) Navega a la lista de productos
+        // Reset the form to clear the flags 
+        // y se va al listado de productos
+        //TODO
+        this.productForm.reset();
         this.router.navigate(['/products']);
     }
 }
