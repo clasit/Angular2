@@ -1,0 +1,6 @@
+-------------------------------
+Plugins para Visual Studio Code
+-------------------------------
+
+Angular v5 snipetts by John Papa
+TSLint for Visual Studio Code

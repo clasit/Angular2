@@ -9,7 +9,7 @@ import { BookStoreService } from '../book-store.service';
   styleUrls: ['./books-list.component.scss']
 })
 export class BooksListComponent implements OnInit {
-  booksList: Book[];
+  booksList: Book[] = [];
 
   constructor(private storeService: BookStoreService) {
   }
